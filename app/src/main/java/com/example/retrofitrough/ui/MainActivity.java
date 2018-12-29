@@ -9,6 +9,7 @@ import android.widget.Toast;
 import com.example.retrofitrough.R;
 import com.example.retrofitrough.api.model.GithubRepo;
 import com.example.retrofitrough.api.service.GithubClient;
+import com.example.retrofitrough.ui.adapter.GithubRepoAdapter;
 
 import java.util.List;
 
@@ -45,6 +46,7 @@ public class MainActivity extends AppCompatActivity {
             public void onResponse(Call<List<GithubRepo>> call, Response<List<GithubRepo>> response) {
                 List<GithubRepo> repos = response.body();
 
+                listView.setAdapter(new GithubRepoAdapter(MainActivity.this, repos));
 
             }
 
