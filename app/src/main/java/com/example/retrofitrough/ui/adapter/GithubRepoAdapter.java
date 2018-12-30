@@ -1,6 +1,7 @@
 package com.example.retrofitrough.ui.adapter;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,6 +14,7 @@ import com.example.retrofitrough.api.model.GithubRepo;
 import java.util.List;
 
 public class GithubRepoAdapter extends ArrayAdapter<GithubRepo> {
+    private static final String TAG = "GithubRepoAdapter";
 
     private Context context;
     private List<GithubRepo> repoList;
@@ -35,10 +37,22 @@ public class GithubRepoAdapter extends ArrayAdapter<GithubRepo> {
         }
 
         TextView textView = row.findViewById(R.id.list_item_pagination_text);
+        TextView idTv = row.findViewById(R.id.list_item_id_text);
+        TextView htmlUrl = row.findViewById(R.id.list_item_html_url);
+
 
         GithubRepo item = repoList.get(position);
-        String message = item.getName();
-        textView.setText(message);
+        int id = item.getId();
+        String repoName = item.getName();
+        String url = item.getHtml_url();
+
+        Log.d(TAG, "getView: id= " + id);
+        Log.d(TAG, "getView: repoName= " + repoName);
+        Log.d(TAG, "getView: url= " + url);
+
+        idTv.setText(String.valueOf(id));
+        textView.setText(repoName);
+        htmlUrl.setText(url);
 
         return row;
     }

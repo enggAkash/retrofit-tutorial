@@ -44,6 +44,7 @@ public class MainActivity extends AppCompatActivity {
         call.enqueue(new Callback<List<GithubRepo>>() {
             @Override
             public void onResponse(Call<List<GithubRepo>> call, Response<List<GithubRepo>> response) {
+
                 List<GithubRepo> repos = response.body();
 
                 listView.setAdapter(new GithubRepoAdapter(MainActivity.this, repos));
