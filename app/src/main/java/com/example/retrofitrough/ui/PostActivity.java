@@ -7,10 +7,13 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.example.retrofitrough.BuildConfig;
 import com.example.retrofitrough.R;
 import com.example.retrofitrough.api.model.User;
 import com.example.retrofitrough.api.service.UserClient;
 
+import okhttp3.OkHttpClient;
+import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -45,16 +48,30 @@ public class PostActivity extends AppCompatActivity {
 
     private void sendNetworkRequest(User user) {
 
+        //Create Okhttp Client
+        OkHttpClient.Builder okhttpBuilder = new OkHttpClient.Builder();
+
+        HttpLoggingInterceptor loggingInterceptor = new HttpLoggingInterceptor();
+        loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
+
+        // Log only if app in development mode
+        if (BuildConfig.DEBUG) {
+            okhttpBuilder.addInterceptor(loggingInterceptor);
+        }
+
+        // Create Retrofit instance
         Retrofit.Builder builder = new Retrofit.Builder()
                 .baseUrl("https://reqres.in/api/")
-                .addConverterFactory(GsonConverterFactory.create());
+                .addConverterFactory(GsonConverterFactory.create())
+                .client(okhttpBuilder.build());
 
         Retrofit retrofit = builder.build();
 
+        // Get Client & Call Object for the request
         UserClient userClient = retrofit.create(UserClient.class);
-
         Call<User> call = userClient.createUser(user);
 
+        // Execute Network Request
         call.enqueue(new Callback<User>() {
             @Override
             public void onResponse(Call<User> call, Response<User> response) {
