@@ -44,7 +44,7 @@ public class GithubRepoAdapter extends ArrayAdapter<GithubRepo> {
         GithubRepo item = repoList.get(position);
         int id = item.getId();
         String repoName = item.getName();
-        String url = item.getHtml_url();
+        String url = item.getHtmlUrl();
 
         Log.d(TAG, "getView: id= " + id);
         Log.d(TAG, "getView: repoName= " + repoName);

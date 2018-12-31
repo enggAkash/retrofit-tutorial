@@ -14,7 +14,7 @@ public class GithubRepo {
         return name;
     }
 
-    public String getHtml_url() {
+    public String getHtmlUrl() {
         return html_url;
     }
 }
