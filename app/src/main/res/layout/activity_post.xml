@@ -20,10 +20,16 @@
         android:hint="JOB" />
 
     <Button
+        android:id="@+id/upload_avtar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Upload Avtar" />
+
+    <Button
         android:id="@+id/create_account_btn"
         android:layout_width="match_parent"
-        android:text="Create Account"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:text="Create Account" />
 
 
 </LinearLayout>
