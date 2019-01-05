@@ -19,6 +19,12 @@
         android:layout_height="wrap_content"
         android:hint="JOB" />
 
+    <EditText
+        android:id="@+id/description_et"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Description" />
+
     <Button
         android:id="@+id/upload_avtar"
         android:layout_width="match_parent"

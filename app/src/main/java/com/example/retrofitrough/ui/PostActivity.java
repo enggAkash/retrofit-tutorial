@@ -3,7 +3,6 @@ package com.example.retrofitrough.ui;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.content.pm.PermissionGroupInfo;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -20,10 +19,15 @@ import com.example.retrofitrough.BuildConfig;
 import com.example.retrofitrough.R;
 import com.example.retrofitrough.api.model.User;
 import com.example.retrofitrough.api.service.UserClient;
+import com.example.retrofitrough.util.FileUtil;
 
-import java.security.Permission;
+import java.io.File;
 
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
 import okhttp3.OkHttpClient;
+import okhttp3.RequestBody;
+import okhttp3.ResponseBody;
 import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -37,9 +41,10 @@ public class PostActivity extends AppCompatActivity {
     private static final int PICK_IMAGE_FROM_GALLERY = 2;
     private EditText nameEt;
     private EditText jobEt;
+    private EditText descriptionEt;
     private Button uploadAvtar;
     private Button createAccountBtn;
-    private Uri avtarUri = null;
+    private Uri avatarUri = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,6 +53,7 @@ public class PostActivity extends AppCompatActivity {
 
         nameEt = findViewById(R.id.name_et);
         jobEt = findViewById(R.id.job_et);
+        descriptionEt = findViewById(R.id.description_et);
         createAccountBtn = findViewById(R.id.create_account_btn);
         uploadAvtar = findViewById(R.id.upload_avtar);
 
@@ -67,7 +73,10 @@ public class PostActivity extends AppCompatActivity {
             public void onClick(View v) {
                 User user = new User(nameEt.getText().toString(), jobEt.getText().toString());
 
-                sendNetworkRequest(user);
+                if (avatarUri == null)
+                    sendNetworkRequest(user);
+                else
+                    uploadFile(user, avatarUri);
             }
         });
 
@@ -125,7 +134,46 @@ public class PostActivity extends AppCompatActivity {
 
     }
 
-    private void uploadFile(Uri fileUri) {
+    private void uploadFile(User user, Uri fileUri) {
+
+        OkHttpClient.Builder okHttpClientBuilder = new OkHttpClient.Builder();
+        HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
+        interceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
+        if (BuildConfig.DEBUG)
+            okHttpClientBuilder.addInterceptor(interceptor);
+
+        RequestBody descriptionPart = RequestBody.create(MultipartBody.FORM, descriptionEt.getText().toString());
+
+        File avatarFile = FileUtil.getFile(this, fileUri);
+        RequestBody filePart = RequestBody.create(
+                MediaType.parse(getContentResolver().getType(fileUri)),
+                avatarFile
+        );
+
+        MultipartBody.Part fileMultipart = MultipartBody.Part.createFormData("photo", avatarFile.getName(), filePart);
+
+        Retrofit.Builder builder = new Retrofit.Builder()
+                .baseUrl("https://reqres.in/api/")
+                .addConverterFactory(GsonConverterFactory.create())
+                .client(okHttpClientBuilder.build());
+
+        Retrofit retrofit = builder.build();
+
+        UserClient client = retrofit.create(UserClient.class);
+
+        Call<ResponseBody> call = client.createUser(/*user,*/ descriptionPart, fileMultipart);
+
+        call.enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                Toast.makeText(PostActivity.this, "Yeah", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+                Toast.makeText(PostActivity.this, "Shit!!", Toast.LENGTH_SHORT).show();
+            }
+        });
 
     }
 
@@ -150,8 +198,7 @@ public class PostActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
 
         if (requestCode == PICK_IMAGE_FROM_GALLERY && resultCode == RESULT_OK && data != null && data.getData() != null) {
-            Uri uri = data.getData();
-            uploadFile(uri);
+            avatarUri = data.getData();
         }
     }
 }

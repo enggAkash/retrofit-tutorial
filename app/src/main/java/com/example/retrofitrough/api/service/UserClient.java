@@ -19,7 +19,7 @@ public interface UserClient {
     @Multipart
     @POST("api/users")
     Call<ResponseBody> createUser(
-            @Part User user,
+//            @Part User user,
             @Part("description") RequestBody description,
             @Part MultipartBody.Part avatar
     );
