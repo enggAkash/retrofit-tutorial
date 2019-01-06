@@ -1,7 +1,8 @@
 package com.example.retrofitrough.ui;
 
-import android.support.v7.app.AppCompatActivity;
+import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.widget.ListView;
 import android.widget.Toast;
@@ -9,6 +10,7 @@ import android.widget.Toast;
 import com.example.retrofitrough.R;
 import com.example.retrofitrough.api.model.GithubRepo;
 import com.example.retrofitrough.api.service.GithubClient;
+import com.example.retrofitrough.background.BackGroundService;
 import com.example.retrofitrough.ui.adapter.GithubRepoAdapter;
 
 import java.util.List;
@@ -32,14 +34,16 @@ public class GetActivity extends AppCompatActivity {
         listView = findViewById(R.id.pagination_list);
 
         Retrofit.Builder retroBuilder = new Retrofit.Builder()
-                .baseUrl("https://api.github.com")
+                .baseUrl("https://api.github.com/")
                 .addConverterFactory(GsonConverterFactory.create());
 
         Retrofit retrofit = retroBuilder.build();
 
 
         GithubClient client = retrofit.create(GithubClient.class);
-        Call<List<GithubRepo>> call = client.reposForUser("enggAkash");
+//        Call<List<GithubRepo>> call = client.reposForUser("enggAkash");
+        Call<List<GithubRepo>> call = client.reposForUser("https://api.github.com/users/enggAkash/repos");
+
 
         call.enqueue(new Callback<List<GithubRepo>>() {
             @Override
@@ -58,6 +62,9 @@ public class GetActivity extends AppCompatActivity {
             }
         });
 
+        /*Log.d(TAG, "onCreate: starting background service");
+        Intent intent = new Intent(this, BackGroundService.class);
+        startService(intent);*/
 
     }
 }

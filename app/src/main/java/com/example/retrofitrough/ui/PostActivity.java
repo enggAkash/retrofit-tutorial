@@ -1,6 +1,7 @@
 package com.example.retrofitrough.ui;
 
 import android.Manifest;
+import android.content.ClipData;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
@@ -10,6 +11,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -22,6 +24,9 @@ import com.example.retrofitrough.api.service.UserClient;
 import com.example.retrofitrough.util.FileUtil;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
@@ -63,6 +68,7 @@ public class PostActivity extends AppCompatActivity {
                 Intent intent = new Intent();
                 intent.setType("image/*");
                 intent.setAction(Intent.ACTION_GET_CONTENT);
+//                intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
 
                 startActivityForResult(Intent.createChooser(intent, "Choose Avtar"), PICK_IMAGE_FROM_GALLERY);
             }
@@ -142,16 +148,6 @@ public class PostActivity extends AppCompatActivity {
         if (BuildConfig.DEBUG)
             okHttpClientBuilder.addInterceptor(interceptor);
 
-        RequestBody descriptionPart = RequestBody.create(MultipartBody.FORM, descriptionEt.getText().toString());
-
-        File avatarFile = FileUtil.getFile(this, fileUri);
-        RequestBody filePart = RequestBody.create(
-                MediaType.parse(getContentResolver().getType(fileUri)),
-                avatarFile
-        );
-
-        MultipartBody.Part fileMultipart = MultipartBody.Part.createFormData("photo", avatarFile.getName(), filePart);
-
         Retrofit.Builder builder = new Retrofit.Builder()
                 .baseUrl("https://reqres.in/api/")
                 .addConverterFactory(GsonConverterFactory.create())
@@ -161,7 +157,17 @@ public class PostActivity extends AppCompatActivity {
 
         UserClient client = retrofit.create(UserClient.class);
 
-        Call<ResponseBody> call = client.createUser(/*user,*/ descriptionPart, fileMultipart);
+        Map<String, RequestBody> partMap = new HashMap<>();
+        partMap.put("client", createPartFromString("jsdfj323"));
+        partMap.put("secret", createPartFromString("!@Dds392"));
+
+        if (!TextUtils.isEmpty(descriptionEt.getText().toString()))
+            partMap.put("description", createPartFromString(descriptionEt.getText().toString()));
+
+        Call<ResponseBody> call = client.createUser(
+                "this is user header",
+                partMap,
+                prepareFilePart("photo", fileUri));
 
         call.enqueue(new Callback<ResponseBody>() {
             @Override
@@ -175,6 +181,22 @@ public class PostActivity extends AppCompatActivity {
             }
         });
 
+    }
+
+    @NonNull
+    private RequestBody createPartFromString(String descriptionString) {
+        return RequestBody.create(MultipartBody.FORM, descriptionString);
+    }
+
+    @NonNull
+    private MultipartBody.Part prepareFilePart(String partName, Uri fileUri) {
+        File file = FileUtil.getFile(this, fileUri);
+
+        RequestBody requestBody = RequestBody.create(
+                MediaType.parse(getContentResolver().getType(fileUri)),
+                file);
+
+        return MultipartBody.Part.createFormData(partName, file.getName(), requestBody);
     }
 
     @Override
@@ -198,7 +220,16 @@ public class PostActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
 
         if (requestCode == PICK_IMAGE_FROM_GALLERY && resultCode == RESULT_OK && data != null && data.getData() != null) {
+            // when single file
             avatarUri = data.getData();
+
+            // when allowed multiple selection
+//            ClipData clipData = data.getClipData();
+//            ArrayList<Uri> fileUris = new ArrayList<>();
+//            for (int i=0; i<clipData.getItemCount(); i++) {
+//                fileUris.add(clipData.getItemAt(i).getUri());
+//            }
+//            uploadFile(null, fileUris.get(0));
         }
     }
 }

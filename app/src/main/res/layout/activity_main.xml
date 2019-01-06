@@ -20,5 +20,11 @@
         android:onClick="retrofitPost"
         android:text="Retrofit Post" />
 
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:onClick="retrofitDownload"
+        android:text="Retrofit Download" />
+
 
 </LinearLayout>

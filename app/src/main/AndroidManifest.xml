@@ -3,7 +3,6 @@
     package="com.example.retrofitrough">
 
     <uses-permission android:name="android.permission.INTERNET" />
-
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
@@ -22,7 +21,11 @@
             </intent-filter>
         </activity>
         <activity android:name=".ui.GetActivity" />
-        <activity android:name=".ui.PostActivity"></activity>
+        <activity android:name=".ui.PostActivity" />
+
+        <service android:name=".background.BackGroundService" />
+
+        <activity android:name=".ui.DownloadActivity"></activity>
     </application>
 
 </manifest>

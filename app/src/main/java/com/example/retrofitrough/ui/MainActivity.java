@@ -24,4 +24,8 @@ public class MainActivity extends AppCompatActivity {
     public void retrofitPost(View view) {
         startActivity(new Intent(this, PostActivity.class));
     }
+
+    public void retrofitDownload(View view) {
+        startActivity(new Intent(this, DownloadActivity.class));
+    }
 }
